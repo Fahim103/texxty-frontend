@@ -16,7 +16,7 @@ class Home extends Component{
                 </p>
                 <p> 
                     Not a member ?
-                    <Link to={UserRegisterRoute()} className="ml-1">
+                    <Link to={UserRegisterRoute} className="ml-1">
                        Go to Registration 
                     </Link>
                 </p>

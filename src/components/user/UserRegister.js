@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
+import axios from 'axios';
 import {Form, Button, Row, Col} from 'react-bootstrap';
 import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
 
@@ -7,11 +8,11 @@ import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
 class UserRegister extends Component {
 
     state = {
-        fullname: null,
-        username: null,
-        email: null,
-        password: null,
-        confirmPassword: null,
+        fullname: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
     };
 
     handleChange = (e) => {
@@ -34,34 +35,37 @@ class UserRegister extends Component {
 
     registerUser = (e) => {
         e.preventDefault();
-        console.log(this.state);
         if(this.state.password !== this.state.confirmPassword){
             console.log("password doesn't match");
             return;
         }
-         // 1. get the username and password [done]
-
-        // 2. make the request
-        const rootUrl = GetApiRootUrl();
-        fetch(rootUrl + '/api/Users/Register', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                fullname: this.state.fullname,
-                username: this.state.username,
-                email: this.state.email,
-                password: this.state.password
-            })
-
-        })
-        .then(resp => resp.json())
-        .then(resp => {
-            console.log(resp);
-        })
-        .catch(err => console.error(err));
-        // 3. See return output
+        
+        const url = GetApiRootUrl + '/api/Users/Register';
+        axios.post(url, {
+            fullname: this.state.fullname,
+            username: this.state.username,
+            email: this.state.email,
+            password: this.state.password
+        }).then(response => {
+            console.log(response);
+        }).catch(error => {
+            if (error.response) {
+                // client received an error response (5xx, 4xx)
+                console.log(error.response);
+                if (error.response.status === 400) {
+                    // TODO :  See the console log below and display that message to user
+                    console.log(error.response.data.message);
+                } else if (error.response.status === 401){
+                    // TODO : Incorrect username / password message show
+                    console.log("Invalid username / password");
+                }
+            } else if (error.request) {
+                // client never received a response, or request never left
+                console.log(error.request)
+            } else {
+                // anything else
+            }
+        });
     }
 
     render(){
@@ -73,7 +77,7 @@ class UserRegister extends Component {
                             FullName
                         </Form.Label>
                         <Col sm={10}>
-                        <Form.Control type="text" placeholder="FullName" name="fullname" required="required" onChange={this.handleChange} />
+                        <Form.Control type="text" value={this.state.fullname} placeholder="FullName" name="fullname" required="required" onChange={this.handleChange} />
                         </Col>
                     </Form.Group>
                 
@@ -82,7 +86,7 @@ class UserRegister extends Component {
                             Username
                         </Form.Label>
                         <Col sm={10}>
-                        <Form.Control type="text" placeholder="Username" name="username" required="required" onChange={this.handleChange} />
+                        <Form.Control type="text" value={this.state.username} placeholder="Username" name="username" required="required" onChange={this.handleChange} />
                         </Col>
                     </Form.Group>
                     
@@ -91,7 +95,7 @@ class UserRegister extends Component {
                             Email
                         </Form.Label>
                         <Col sm={10}>
-                        <Form.Control type="email" placeholder="Email" name="email" required="required" onChange={this.handleChange} />
+                        <Form.Control type="email" value={this.state.email} placeholder="Email" name="email" required="required" onChange={this.handleChange} />
                         </Col>
                     </Form.Group>
 
@@ -100,7 +104,7 @@ class UserRegister extends Component {
                             Password
                         </Form.Label>
                         <Col sm={10}>
-                        <Form.Control type="password" placeholder="Password" name="password" required="required" onChange={this.handleChange} />
+                        <Form.Control type="password" value={this.state.password} placeholder="Password" name="password" required="required" onChange={this.handleChange} />
                         </Col>
                     </Form.Group>
 
@@ -109,14 +113,14 @@ class UserRegister extends Component {
                             Confirm Password
                         </Form.Label>
                         <Col sm={10}>
-                        <Form.Control type="password" placeholder="Confirm Password" name="confirmPassword" required="required" onChange={this.handleChange} />
+                        <Form.Control type="password" value={this.state.confirmPassword} placeholder="Confirm Password" name="confirmPassword" required="required" onChange={this.handleChange} />
                         </Col>
                     </Form.Group>
 
                     <Form.Group as={Row}>
                         <Col sm={{span: 10, offset:2}}>
                             <Button type="submit">Sign in</Button>
-                            <Link to={UserLoginRoute()} className="ml-1">
+                            <Link to={UserLoginRoute} className="ml-1">
                                 <Button variant="outline-info">Already a Member</Button>
                             </Link>
                         </Col>

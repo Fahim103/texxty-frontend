@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
-
+import axios from 'axios';
 import {Form, Button} from 'react-bootstrap';
 
-import {UserRegisterRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
+import history from '../../history';
+import {UserRegisterRoute, GetApiRootUrl, BlogListRoute} from '../../utils/RoutingPaths';
 
 
 class AdminLogin extends Component {
 
     state = {
-        username: null,
-        password: null,
+        username: '',
+        password: '',
     };
 
     handleChange = (e) => {
@@ -21,29 +22,44 @@ class AdminLogin extends Component {
             this.setState({password: e.target.value});
         }
     }
+    
+    updateLoginInfo = (e) => {
+        this.props.updateLoginInfo(e);
+    }
 
     loginUser = (e) => {
         e.preventDefault();
-         // 1. get the username and password [done]
-
-        // 2. make the request
-        const rootUrl = GetApiRootUrl();
-        fetch(rootUrl + '/api/Admin/Login', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: this.state.username,
-                password: this.state.password
+        const url = GetApiRootUrl + '/api/Admin/Login';
+        axios.post(url, {
+            username: this.state.username,
+            password: this.state.password
+        }).then(response => {
+            console.log(response);
+            this.updateLoginInfo({
+                'username' : this.state.username,
+                'token' : response.data.token
             })
-
-        })
-        .then(resp => resp.json())
-        .then(resp => {
-            console.log(resp);
-        })
-        .catch(err => console.error("ERROR " + err));
+            // Redirect to blog list
+            // TODO : Redirect to admin panel maybe ? 
+            history.push(BlogListRoute);
+        }).catch(error => {
+            if (error.response) {
+                // client received an error response (5xx, 4xx)
+                console.log(error.response);
+                if (error.response.status === 401) {
+                    // TODO : Incorrect username / password message show
+                    console.log("Invalid username / password");
+                }else if (error.response.status === 403) {
+                    // TODO : Forbidden route message
+                    console.log("Forbidden route");
+                }
+              } else if (error.request) {
+                // client never received a response, or request never left
+                console.log(error.request)
+              } else {
+                // anything else
+              }
+        }) 
     }
 
     render() {
@@ -52,17 +68,17 @@ class AdminLogin extends Component {
                 <Form method="post" onSubmit={this.loginUser}>
                     <Form.Group controlId="username">
                         <Form.Label>Username</Form.Label>
-                        <Form.Control type="text" placeholder="Enter username" name="username" required="required" onChange={this.handleChange} />
+                        <Form.Control type="text" value={this.state.username} placeholder="Enter username" name="username" required="required" onChange={this.handleChange} />
                     </Form.Group>
 
                     <Form.Group controlId="userPassword">
                         <Form.Label>Password</Form.Label>
-                        <Form.Control type="password" placeholder="Password" name="password" required="required" onChange={this.handleChange} />
+                        <Form.Control type="password" value={this.state.password} placeholder="Password" name="password" required="required" onChange={this.handleChange} />
                     </Form.Group>
                     <Button variant="primary" type="submit">
                         Login
                     </Button>
-                    <Link to={UserRegisterRoute()} className="ml-1">
+                    <Link to={UserRegisterRoute} className="ml-1">
                         <Button variant="outline-info">Go to Registration</Button>
                     </Link>
                 </Form>

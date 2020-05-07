@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
+import axios from 'axios';
 import {Navbar, Nav, Form, FormControl, Button, NavDropdown} from 'react-bootstrap'
-import {UserLoginRoute, UserRegisterRoute, GetApiRootUrl, AdminLoginRoute} from '../utils/RoutingPaths';
+import {UserLoginRoute, UserRegisterRoute, GetApiRootUrl, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute} from '../utils/RoutingPaths';
 /*
     Link or NavLink tag stops the default action of anchor tag,
     which is to send request to server and get resource
@@ -27,19 +28,17 @@ class MyNavbar extends Component {
 
     SearchContents = (e) => {
         e.preventDefault();
-        console.log(this.state.searchText);
-        const rootUrl = GetApiRootUrl();
-        const url = rootUrl + '/api/Search/' + this.state.searchText;
-        console.log(url);
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                    if(Object.keys(data[0]).length > 0 || Object.keys(data[1]).length > 0){
-                        console.log(data);
-                    }else{
-                        console.log("NO Data");
-                    }    
-            });
+        const url = GetApiRootUrl + '/api/Search/' + this.state.searchText
+        axios.get(url).then(response => {
+            if (response.status === 200) {
+                const data = response.data;
+                if(data[0].length > 0 || data[1].length > 0){
+                    console.log(data);
+                }else{
+                    console.log("No content found");
+                }
+            }
+        })
     }
 
     render() {
@@ -51,26 +50,27 @@ class MyNavbar extends Component {
                 <Navbar.Brand> <NavLink to='/'>Texxty</NavLink></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                {(username !== null) ? (<Nav.Link href="/">Blog</Nav.Link>) : (null)}
+                {(username !== '') ? (<Nav.Link as={Link} to={BlogListRoute}>Blog</Nav.Link>) : (null)}
                     <Nav className="ml-auto">                    
                         <Form inline onSubmit={this.SearchContents}>
                             <FormControl type="text" placeholder="Search" className="mr-sm-2" required onChange={this.GetSearchText} />
                             <Button variant="outline-success" type="submit">Search</Button>
                         </Form>
                     </Nav>
-                    {(username !== null) ? (
+                    {(username !== '') ? (
                         <Nav>
                             <NavDropdown title={username} id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Edit Details</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={EditDetailsRoute}>Edit Details</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to={UpdatePasswordRoute}>Change Password</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/" onClick={this.logoutUser}>Logout</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/" onClick={this.logoutUser}>Logout</NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
                     ) : (
                         <Nav>
-                            <Nav.Link href={AdminLoginRoute()}>Admin Login</Nav.Link>
-                            <Nav.Link href={UserLoginRoute()}>Login</Nav.Link>
-                            <Nav.Link href={UserRegisterRoute()}>Register</Nav.Link>
+                            <Nav.Link as={Link} to={AdminLoginRoute}>Admin Login</Nav.Link>
+                            <Nav.Link as={Link} to={UserLoginRoute}>Login</Nav.Link>
+                            <Nav.Link as={Link} to={UserRegisterRoute}>Register</Nav.Link>
                         </Nav>
                     )}
                 </Navbar.Collapse>

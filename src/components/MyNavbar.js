@@ -12,10 +12,17 @@ import {UserLoginRoute, UserRegisterRoute, GetApiRootUrl, AdminLoginRoute, BlogL
 
     NavLink adds active class to the current item which is useful for styling
 */
+import history from '../history';
 class MyNavbar extends Component {
 
     state = {
         searchText: ''
+    }
+
+    updateSearch = (searchResult) => {
+        console.log("Update Search")
+        let currentUrl = history.location.pathname;
+        this.props.updateSearch(searchResult, currentUrl);
     }
 
     logoutUser = () => {
@@ -32,10 +39,23 @@ class MyNavbar extends Component {
         axios.get(url).then(response => {
             if (response.status === 200) {
                 const data = response.data;
+                let searchResponse = [];
                 if(data[0].length > 0 || data[1].length > 0){
                     console.log(data);
+                    if(data[0].length > 0){
+                        searchResponse[0] = data[0];
+                    }
+                    if(data[1].length > 0){
+                        if(searchResponse.length === 0){
+                            searchResponse[0] = data[1];
+                        }else{
+                            searchResponse[1] = data[1];
+                        }
+                    }
+                    
+                    this.updateSearch(searchResponse);
                 }else{
-                    console.log("No content found");
+                    this.updateSearch([]);
                 }
             }
         })

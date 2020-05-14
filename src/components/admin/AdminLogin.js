@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
-import {Form, Button} from 'react-bootstrap';
+import {Form, Button, Alert} from 'react-bootstrap';
 
 import history from '../../history';
 import {UserRegisterRoute, GetApiRootUrl, BlogListRoute} from '../../utils/RoutingPaths';
@@ -12,6 +12,7 @@ class AdminLogin extends Component {
     state = {
         username: '',
         password: '',
+        errors: ''
     };
 
     handleChange = (e) => {
@@ -49,9 +50,11 @@ class AdminLogin extends Component {
                 if (error.response.status === 401) {
                     // TODO : Incorrect username / password message show
                     console.log("Invalid username / password");
+                    this.setState({errors: "Invalid username or password"});
                 }else if (error.response.status === 403) {
                     // TODO : Forbidden route message
                     console.log("Forbidden route");
+                    this.setState({errors: "You don't have the permission to login as admin"});
                 }
               } else if (error.request) {
                 // client never received a response, or request never left
@@ -65,6 +68,11 @@ class AdminLogin extends Component {
     render() {
         return (
             <div className="mt-5">
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="post" onSubmit={this.loginUser}>
                     <Form.Group controlId="username">
                         <Form.Label>Username</Form.Label>

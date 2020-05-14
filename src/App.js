@@ -27,7 +27,8 @@ class App extends Component {
   state = {
     user: {
       'username' : '',
-      'token' : ''
+      'token' : '',
+      'userID' : 0
     },
     search: {
       results: [],
@@ -55,7 +56,8 @@ class App extends Component {
     this.setState(prevState => ({
         user: {                   
             username: response.username,
-            token: response.token
+            token: response.token,
+            userID : response.userID
         }
     }))
   };
@@ -82,7 +84,8 @@ class App extends Component {
                 <Route exact path={AdminLoginRoute} component={() => (<AdminLogin updateLoginInfo={this.updateLoginInfo} />)} />
                 <Route exact path={BlogListRoute} component={BlogList} />
                 <Route exact path={EditDetailsRoute} component={EditDetails} />
-                <Route exact path={UpdatePasswordRoute} component={UpdatePassword} />
+                {/* <Route exact path={UpdatePasswordRoute} component={() => <UpdatePassword user = {this.state.user} /> } /> */}
+                <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
               </Switch>
           </div>

@@ -16,7 +16,6 @@ class SearchResultComponent extends Component {
     }
 
     componentDidMount(){
-        console.log(this.props);
         if (this.props.search.returnUrl === null){
             history.push('/');
         }else{

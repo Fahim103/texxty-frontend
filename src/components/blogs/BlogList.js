@@ -4,7 +4,7 @@ import history from '../../history';
 import {Link} from 'react-router-dom';
 import {Card, Button} from 'react-bootstrap';
 
-import {GetApiRootUrl, IndividualBlogRoute, UserLoginRoute, CreateNewBlogRoute, BlogEditRoute} from '../../utils/RoutingPaths';
+import {GetApiRootUrl, IndividualBlogRoute, UserLoginRoute, CreateNewBlogRoute, BlogEditRoute, BlogDeleteRoute} from '../../utils/RoutingPaths';
 
 function currentDate() {
     return new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
@@ -53,6 +53,7 @@ class BlogList extends Component {
                         </Card.Text>
                         <Card.Link as={Link} to={IndividualBlogRoute(blog.blogID)}>View Blog</Card.Link>
                         <Card.Link as={Link} to={BlogEditRoute(blog.blogID)}>Edit Blog</Card.Link>
+                        <Card.Link as={Link} to={BlogDeleteRoute(blog.blogID)}>Delete Blog</Card.Link>
                     </Card.Body>
                 </Card>
             )

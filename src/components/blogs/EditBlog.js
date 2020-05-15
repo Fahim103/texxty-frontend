@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import {Card, Form, Button} from 'react-bootstrap';
 import axios from 'axios';
 
-import {GetApiRootUrl, BlogListRoute} from '../../utils/RoutingPaths';
+import {GetApiRootUrl, BlogListRoute, UserLoginRoute} from '../../utils/RoutingPaths';
 
 class EditBlog extends Component {
     _isMounted = false;
@@ -19,46 +19,51 @@ class EditBlog extends Component {
 
     componentDidMount() {
         this._isMounted = true;
-        const {token, userID} = this.props.user;
-        const blogID = this.props.match.params.id;
-        const url = GetApiRootUrl + `/api/Blogs/${blogID}`; // TODO : Might need to change
-        axios.get(url,{
-            headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(response => {
-            if (response.status === 200) {
-                const data = response.data;
-                this.setState({
-                    blogID : data.blogID,
-                    title : data.title,
-                    description : data.description,
-                    private : data.private,
-                    selectedBlogTopic : data.topicID
-                })
-                // Get topic list from db
-                const url = GetApiRootUrl + `/api/Topics`;
-                axios.get(url,{
-                    headers: { Authorization: `Bearer ${token}` }
-                })
-                .then(response => {
-                    if (response.status === 200) {
-                        const data = response.data;
-                        if(this._isMounted) {
-                            this.setState({blogTopics: data})
+
+        if (this.props.user.userID === 0) {
+            this.props.history.push(`${UserLoginRoute}`);
+        } else {
+            const {token} = this.props.user;
+            const blogID = this.props.match.params.id;
+            const url = GetApiRootUrl + `/api/Blogs/${blogID}`; // TODO : Might need to change
+            axios.get(url,{
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    const data = response.data;
+                    this.setState({
+                        blogID : data.blogID,
+                        title : data.title,
+                        description : data.description,
+                        private : data.private,
+                        selectedBlogTopic : data.topicID
+                    })
+                    // Get topic list from db
+                    const url = GetApiRootUrl + `/api/Topics`;
+                    axios.get(url,{
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                    .then(response => {
+                        if (response.status === 200) {
+                            const data = response.data;
+                            if(this._isMounted) {
+                                this.setState({blogTopics: data})
+                            }
                         }
-                    }
-                }).catch(error => {
-                    if (error.response) { 
-                        console.log("Blog Topic fetch error");
-                    }
-                })
-            }
-            console.log(this.state);
-        }).catch(error => {
-            if (error.response) { 
-                console.log(error.response);
-            }
-        })
+                    }).catch(error => {
+                        if (error.response) { 
+                            console.log("Blog Topic fetch error");
+                        }
+                    })
+                }
+                console.log(this.state);
+            }).catch(error => {
+                if (error.response) { 
+                    console.log(error.response);
+                }
+            })
+        }
     }
 
     componentWillUnmount() {
@@ -99,6 +104,7 @@ class EditBlog extends Component {
         ).then(response => {
             if(response.status === 200) {
                 console.log("Blog Edited");
+                this.props.history.push(`${BlogListRoute}`);
             }
         }).catch(error => {
             console.log(error);

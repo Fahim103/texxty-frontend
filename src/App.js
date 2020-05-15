@@ -30,6 +30,7 @@ import BlogList from './components/blogs/BlogList';
 import CreateBlog from './components/blogs/CreateBlog';
 import BlogDetails from './components/blogs/BlogDetails';
 import EditBlog from './components/blogs/EditBlog';
+import DeleteBlog from './components/blogs/DeleteBlog';
 
 
 class App extends Component {
@@ -105,6 +106,7 @@ class App extends Component {
                 <Route exact path={CreateNewBlogRoute()} component={() => <CreateBlog user={this.state.user} />} />
                 <Route exact path='/Blogs/:id' render={props => <BlogDetails {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:id/Edit' render={props => <EditBlog {...props} user={this.state.user} /> } />
+                <Route exact path='/Blogs/:id/Delete' render={props => <DeleteBlog {...props} user={this.state.user} /> } />
               </Switch>
           </div>
         </Router>

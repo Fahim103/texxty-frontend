@@ -15,6 +15,10 @@ export function BlogEditRoute(blogID) {
     return `${BlogListRoute}/${blogID}/Edit`;
 }
 
+export function BlogDeleteRoute(blogID) {
+    return `${BlogListRoute}/${blogID}/Delete`;
+}
+
 export function CreateNewBlogRoute() {
     return `${BlogListRoute}/CreateNew`;
 }

@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {Card} from 'react-bootstrap';
-import {GetApiRootUrl, IndividualPostRoute} from '../../utils/RoutingPaths';
+import {GetApiRootUrl, IndividualPostRoute, UserLoginRoute} from '../../utils/RoutingPaths';
+import history from '../../history';
 
 class BlogDetails extends Component {
     
@@ -12,32 +13,36 @@ class BlogDetails extends Component {
     }
 
     componentDidMount() {
-        const {token, userID} = this.props.user;
-        const blogID = this.props.match.params.id;
-        const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
-        axios.get(url,{
-            headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(response => {
-            if (response.status === 200) {
-                this.setState({blog: response.data})
-                axios.get(`${GetApiRootUrl}/api/Blogs/${this.state.blog.blogID}/Posts`, 
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }).then(response => {
-                    this.setState({postList: response.data})
-                    console.log(this.state);
-                }).catch(error => {
-                    console.log(error);
-                })
-            }
-            console.log(this.state);
-        }).catch(error => {
-            if (error.response) { 
-                console.log(error.response);
-            }
-        })
-        console.log(this.props);
+        if (this.props.user.userID === 0) {
+            history.push(`${UserLoginRoute}`);
+        } else {
+            const {token, userID} = this.props.user;
+            const blogID = this.props.match.params.id;
+            const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
+            axios.get(url,{
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    this.setState({blog: response.data})
+                    axios.get(`${GetApiRootUrl}/api/Blogs/${this.state.blog.blogID}/Posts`, 
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }).then(response => {
+                        this.setState({postList: response.data})
+                        console.log(this.state);
+                    }).catch(error => {
+                        console.log(error);
+                    })
+                }
+                console.log(this.state);
+            }).catch(error => {
+                if (error.response) { 
+                    console.log(error.response);
+                }
+            })
+            console.log(this.props);
+        }
     }
     
     renderContent() {

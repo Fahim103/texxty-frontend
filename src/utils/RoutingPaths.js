@@ -7,14 +7,22 @@ export const EditDetailsRoute = '/Accounts/EditDetails';
 export const UpdatePasswordRoute = '/Accounts/UpdatePassword';
 
 
-export function IndividualBlogRoute(blogID){
+export function IndividualBlogRoute(blogID) {
     return `${BlogListRoute}/${blogID}`;
-} 
-
-export function PostListRoute(blogID){
-    return `${BlogListRoute}/${blogID}/Posts`;
 }
 
-export function IndividualPostRoute(blogID, postID){
-    return `${PostListRoute(blogID)}/${postID}`;
+export function BlogEditRoute(blogID) {
+    return `${BlogListRoute}/${blogID}/Edit`;
+}
+
+export function CreateNewBlogRoute() {
+    return `${BlogListRoute}/CreateNew`;
+}
+
+export function IndividualPostRoute(blogID, postID) {
+    return `${BlogListRoute}/${blogID}/Posts/${postID}`;
 } 
+
+export function PostListRoute(blogID) {
+    return `${BlogListRoute}/${blogID}/Posts`;
+}

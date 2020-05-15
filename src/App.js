@@ -5,7 +5,10 @@ import {Container} from 'react-bootstrap';
 import {Router, Route, Switch} from 'react-router-dom'
 
 // Route File
-import {UserLoginRoute, UserRegisterRoute, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute} from './utils/RoutingPaths';
+import {
+  UserLoginRoute, UserRegisterRoute, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute, CreateNewBlogRoute,
+  
+} from './utils/RoutingPaths';
 
 // history
 import history from './history';
@@ -13,14 +16,21 @@ import history from './history';
 // Components
 import MyNavbar from './components/MyNavbar';
 import Home from './components/Home';
+import SearchResultComponent from './components/SearchResultComponent';
+
+// Users / Admin
 import UserLogin from './components/user/UserLogin';
 import UserRegister from './components/user/UserRegister';
 import AdminLogin from './components/admin/AdminLogin';
-import BlogList from './components/blogs/BlogList';
 import EditDetails from './components/accounts/EditDetails';
 import UpdatePassword from './components/accounts/UpdatePassword';
 
-import SearchResultComponent from './components/SearchResultComponent';
+// Blogs
+import BlogList from './components/blogs/BlogList';
+import CreateBlog from './components/blogs/CreateBlog';
+import BlogDetails from './components/blogs/BlogDetails';
+import EditBlog from './components/blogs/EditBlog';
+
 
 class App extends Component {
   
@@ -66,7 +76,12 @@ class App extends Component {
     this.setState(prevState => ({
       user:{
         username: '',
-        token: ''
+        token: '',
+        userID : 0
+      },
+      search: {
+        results: [],
+        returnUrl: null
       }
     }))
   };
@@ -82,11 +97,14 @@ class App extends Component {
                 <Route exact path={UserLoginRoute} component={() => (<UserLogin updateLoginInfo={this.updateLoginInfo} />)} />
                 <Route exact path={UserRegisterRoute} component={UserRegister} />
                 <Route exact path={AdminLoginRoute} component={() => (<AdminLogin updateLoginInfo={this.updateLoginInfo} />)} />
-                <Route exact path={BlogListRoute} component={BlogList} />
+                <Route exact path={BlogListRoute} component={() => <BlogList user={this.state.user} /> } />
                 <Route exact path={EditDetailsRoute} component={EditDetails} />
                 {/* <Route exact path={UpdatePasswordRoute} component={() => <UpdatePassword user = {this.state.user} /> } /> */}
                 <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
+                <Route exact path={CreateNewBlogRoute()} component={() => <CreateBlog user={this.state.user} />} />
+                <Route exact path='/Blogs/:id' render={props => <BlogDetails {...props} user={this.state.user} /> } />
+                <Route exact path='/Blogs/:id/Edit' render={props => <EditBlog {...props} user={this.state.user} /> } />
               </Switch>
           </div>
         </Router>

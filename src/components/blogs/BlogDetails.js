@@ -33,7 +33,6 @@ class BlogDetails extends Component {
                         headers: { Authorization: `Bearer ${token}` }
                     }).then(response => {
                         this.setState({postList: response.data})
-                        console.log(this.state);
                     }).catch(error => {
                         console.log(error);
                     })
@@ -44,7 +43,6 @@ class BlogDetails extends Component {
                     console.log(error.response);
                 }
             })
-            console.log(this.props);
         }
     }
 
@@ -61,10 +59,6 @@ class BlogDetails extends Component {
 
     handleBreadcrumbNavigation = (event) => {
         event.preventDefault();
-        // const { router } = this.context;
-    
-        // router.transitionTo(evt.target.href.substring(window.location.origin.length));
-        // console.log(event.target.href)
         this.props.history.push(event.target.href.substring(window.location.origin.length))
     }
 

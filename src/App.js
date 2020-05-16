@@ -111,7 +111,7 @@ class App extends Component {
                 <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
 
-                //TODO : DONT CHANGE THE ORDER IN WHICH THE FOLLOWING BLOG AND POST ROUTES ARE WRITTEN
+                {/* //TODO : DON'T CHANGE THE ORDER IN WHICH THE FOLLOWING BLOG AND POST ROUTES ARE WRITTEN */}
                 <Route exact path='/Blogs/CreateNew' component={() => <CreateBlog user={this.state.user} />} />
                 <Route exact path='/Blogs/:id' render={props => <BlogDetails {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:id/Edit' render={props => <EditBlog {...props} user={this.state.user} /> } />
@@ -121,6 +121,8 @@ class App extends Component {
                 <Route exact path='/Blogs/:blogID/Posts/:postID' render={props => <PostDetails {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:blogID/Posts/:postID/Edit' render={props => <EditPost {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:blogID/Posts/:postID/Delete' render={props => <DeletePost {...props} user={this.state.user} /> } />
+                {/* //TODO : DON'T CHANGE THE ORDER IN WHICH THE ABOVE BLOG AND POST ROUTES ARE WRITTEN */}
+
               </Switch>
           </div>
         </Router>

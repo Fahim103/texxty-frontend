@@ -6,7 +6,7 @@ import {Card, Button} from 'react-bootstrap';
 import {GetApiRootUrl, BlogListRoute, UserLoginRoute} from '../../utils/RoutingPaths';
 
 
-export class DeleteBlog extends Component {
+class DeleteBlog extends Component {
     _isMounter = false;
 
     state = {

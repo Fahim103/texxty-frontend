@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
-import {Link} from 'react-router-dom';
 import {Form, Button, Card} from 'react-bootstrap';
 import axios from 'axios';
 import history from '../../history';
 
-import {IndividualBlogRoute, UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
+import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
 
 class CreatePost extends Component {
     _isMounted = false;
@@ -26,7 +25,6 @@ class CreatePost extends Component {
                 this.setState({blogID: this.props.match.params.blogID});
             }
         }
-        console.log(this.state);
     }
 
     componentWillUnmount() {
@@ -59,7 +57,6 @@ class CreatePost extends Component {
         ).then(response => {
             if(response.status === 201) {
                 // navigate to BlogDetails
-                console.log("Post Created")
                 history.push(`/Blogs/${this.state.blogID}`);
             }
         }).catch(error => {

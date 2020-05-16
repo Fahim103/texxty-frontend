@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import {Form, Button} from 'react-bootstrap';
+import {Card, Form, Button} from 'react-bootstrap';
 import {GetApiRootUrl, UserLoginRoute}  from '../../utils/RoutingPaths';
 
 
@@ -39,7 +39,6 @@ class EditPost extends Component {
                             draft : data.draft,
                         })
                     }
-                    console.log(this.state);
                 }
             }).catch(error => {
                 if (error.response) { 
@@ -68,7 +67,6 @@ class EditPost extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(this.state);
         const {blogID} = this.props.match.params;
 
         const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${this.state.postID}`;
@@ -82,7 +80,6 @@ class EditPost extends Component {
         }
         ).then(response => {
             if(response.status === 200) {
-                console.log("Post Edited");
                 this.goBack();
             }
         }).catch(error => {
@@ -131,7 +128,9 @@ class EditPost extends Component {
     render() {
         return (
             <div>
-                Edit Post
+                <Card className="text-center">
+                    <Card.Header>Edit Post</Card.Header>
+                </Card>
                 {this.renderEditPostForm()}
             </div>
         )

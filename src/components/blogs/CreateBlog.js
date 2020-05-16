@@ -118,7 +118,7 @@ class CreateBlog extends Component {
                     </Form.Group>
 
                     <Form.Group id="private">
-                        <Form.Check type="checkbox" label="Make blog private" name="private" onChange={this.handleChange} />
+                        <Form.Check type="checkbox" checked={this.state.private} label="Make blog private" name="private" onChange={this.handleChange} />
                     </Form.Group>
 
                     <Button variant="primary" type="submit">

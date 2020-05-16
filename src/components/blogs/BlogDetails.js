@@ -4,7 +4,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import {Link} from 'react-router-dom';
-import {Card} from 'react-bootstrap';
+import {Card, Button, Breadcrumb} from 'react-bootstrap';
 import {GetApiRootUrl, IndividualPostRoute, UserLoginRoute, PostEditRoute, PostDeleteRoute} from '../../utils/RoutingPaths';
 import history from '../../history';
 
@@ -47,13 +47,49 @@ class BlogDetails extends Component {
             console.log(this.props);
         }
     }
+
+    renderCreateNewPostButton(blogID) {
+        return (
+            <div>
+                <Link to={`/Blogs/${blogID}/Posts/CreateNew`} className="ml-1">
+                    <Button variant="outline-info">Create new Post</Button>
+                </Link>
+                <hr/>
+            </div>
+        )
+    }
+
+    handleBreadcrumbNavigation = (event) => {
+        event.preventDefault();
+        // const { router } = this.context;
+    
+        // router.transitionTo(evt.target.href.substring(window.location.origin.length));
+        // console.log(event.target.href)
+        this.props.history.push(event.target.href.substring(window.location.origin.length))
+    }
+
+    renderNavigation() {
+        return (
+            <Breadcrumb>
+                <Breadcrumb.Item href='/Blogs' onClick={this.handleBreadcrumbNavigation}>
+                    Blogs
+                </Breadcrumb.Item>
+                <Breadcrumb.Item active>
+                    {this.state.blog.title}
+                </Breadcrumb.Item>
+            </Breadcrumb>
+        );
+    }
     
     renderContent() {
         return(
-            <Card>
-                <Card.Header as="h5">Blog Title : {this.state.blog.title}</Card.Header>
-                {this.renderPostList(this.state.postList)}
-            </Card>
+            <div>
+                {this.renderNavigation()}
+                <Card>
+                    {this.renderCreateNewPostButton(this.state.blog.blogID)}
+                    {this.renderPostList(this.state.postList)}
+                </Card>
+            </div>
         );
     }
 

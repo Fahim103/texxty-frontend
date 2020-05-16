@@ -6,7 +6,7 @@ import {Router, Route, Switch} from 'react-router-dom'
 
 // Route File
 import {
-  UserLoginRoute, UserRegisterRoute, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute, CreateNewBlogRoute,
+  UserLoginRoute, UserRegisterRoute, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute
   
 } from './utils/RoutingPaths';
 
@@ -34,6 +34,7 @@ import DeleteBlog from './components/blogs/DeleteBlog';
 
 // Posts
 import PostDetails from './components/posts/PostDetails';
+import CreatePost from './components/posts/CreatePost';
 import EditPost from './components/posts/EditPost';
 import DeletePost from './components/posts/DeletePost';
 
@@ -109,11 +110,14 @@ class App extends Component {
                 {/* <Route exact path={UpdatePasswordRoute} component={() => <UpdatePassword user = {this.state.user} /> } /> */}
                 <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
-                <Route exact path={CreateNewBlogRoute()} component={() => <CreateBlog user={this.state.user} />} />
+
+                //TODO : DONT CHANGE THE ORDER IN WHICH THE FOLLOWING BLOG AND POST ROUTES ARE WRITTEN
+                <Route exact path='/Blogs/CreateNew' component={() => <CreateBlog user={this.state.user} />} />
                 <Route exact path='/Blogs/:id' render={props => <BlogDetails {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:id/Edit' render={props => <EditBlog {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:id/Delete' render={props => <DeleteBlog {...props} user={this.state.user} /> } />
 
+                <Route exact path='/Blogs/:blogID/Posts/CreateNew' render={props => <CreatePost {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:blogID/Posts/:postID' render={props => <PostDetails {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:blogID/Posts/:postID/Edit' render={props => <EditPost {...props} user={this.state.user} /> } />
                 <Route exact path='/Blogs/:blogID/Posts/:postID/Delete' render={props => <DeletePost {...props} user={this.state.user} /> } />

@@ -1,8 +1,11 @@
+//TODO :  Displays list of post under a blog (not a todo actually :v )
+// TODO : This component must display a 'Create Post' button to create new post under this blog (this is a todo :3)
+
 import React, { Component } from 'react'
 import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {Card} from 'react-bootstrap';
-import {GetApiRootUrl, IndividualPostRoute, UserLoginRoute} from '../../utils/RoutingPaths';
+import {GetApiRootUrl, IndividualPostRoute, UserLoginRoute, PostEditRoute, PostDeleteRoute} from '../../utils/RoutingPaths';
 import history from '../../history';
 
 class BlogDetails extends Component {
@@ -35,7 +38,7 @@ class BlogDetails extends Component {
                         console.log(error);
                     })
                 }
-                console.log(this.state);
+                // console.log(this.state);
             }).catch(error => {
                 if (error.response) { 
                     console.log(error.response);
@@ -67,6 +70,8 @@ class BlogDetails extends Component {
                             </Card.Text>
                             {/* TODO: Redirect to post details page */}
                             <Card.Link as={Link} to={IndividualPostRoute(post.blogID, post.postID)}>View Post</Card.Link>
+                            <Card.Link as={Link} to={PostEditRoute(post.blogID, post.postID)}>Edit Post</Card.Link>
+                            <Card.Link as={Link} to={PostDeleteRoute(post.blogID, post.postID)}>Delete Post</Card.Link>
                         </Card.Body>
                     </Card>
                 )

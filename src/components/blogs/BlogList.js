@@ -1,3 +1,5 @@
+// TODO : This component displays all the blogs of the logged in user (not a todo :3)
+
 import React, { Component } from 'react'
 import axios from 'axios';
 import history from '../../history';

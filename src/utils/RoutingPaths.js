@@ -12,21 +12,39 @@ export function IndividualBlogRoute(blogID) {
 }
 
 export function BlogEditRoute(blogID) {
+    // '/Blogs/1/Edit
     return `${BlogListRoute}/${blogID}/Edit`;
 }
 
 export function BlogDeleteRoute(blogID) {
+    // '/Blogs/1/Delete'
     return `${BlogListRoute}/${blogID}/Delete`;
 }
 
 export function CreateNewBlogRoute() {
+    // '/Blogs/CreateNew
     return `${BlogListRoute}/CreateNew`;
 }
 
+export function PostListRoute(blogID) {
+    // Shows all post under a blog
+    // '/Blogs/1/Posts
+    return `${BlogListRoute}/${blogID}/Posts`;
+}
+
 export function IndividualPostRoute(blogID, postID) {
+    // returns '/Blogs/1/Posts/1'
     return `${BlogListRoute}/${blogID}/Posts/${postID}`;
 } 
 
-export function PostListRoute(blogID) {
-    return `${BlogListRoute}/${blogID}/Posts`;
+export function PostEditRoute(blogID, postID) {
+    // returns '/Blogs/1/Posts/1/Edit'
+    return `${BlogListRoute}/${blogID}/Posts/${postID}/Edit`;
 }
+
+export function PostDeleteRoute(blogID, postID) {
+    // returns '/Blogs/1/Posts/1/Delete'
+    return `${BlogListRoute}/${blogID}/Posts/${postID}/Delete`;
+}
+
+

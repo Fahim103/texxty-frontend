@@ -38,7 +38,8 @@ class AdminLogin extends Component {
             console.log(response);
             this.updateLoginInfo({
                 'username' : this.state.username,
-                'token' : response.data.token
+                'token' : response.data.token,
+                'userID' : response.data.userID
             })
             // Redirect to blog list
             // TODO : Redirect to admin panel maybe ? 

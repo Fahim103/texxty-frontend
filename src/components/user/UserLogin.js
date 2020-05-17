@@ -48,10 +48,10 @@ class UserLogin extends Component {
         }).catch(error => {
             if (error.response) {
                 // client received an error response (5xx, 4xx)
-                console.log(error.response);
+                // console.log(error.response);
                 if(error.response.status === 401){
                     // TODO : Incorrect username / password message show
-                    console.log("Invalid username / password");
+                    // console.log("Invalid username / password");
                     this.setState({errors: "Invalid username or password"});
                 }
             } else if (error.request) {

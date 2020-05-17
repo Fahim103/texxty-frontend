@@ -106,8 +106,7 @@ class App extends Component {
                 <Route exact path={UserRegisterRoute} component={UserRegister} />
                 <Route exact path={AdminLoginRoute} component={() => (<AdminLogin updateLoginInfo={this.updateLoginInfo} />)} />
                 <Route exact path={BlogListRoute} component={() => <BlogList user={this.state.user} /> } />
-                <Route exact path={EditDetailsRoute} component={EditDetails} />
-                {/* <Route exact path={UpdatePasswordRoute} component={() => <UpdatePassword user = {this.state.user} /> } /> */}
+                <Route exact path={EditDetailsRoute} render={props => <EditDetails {...props} user={this.state.user} /> } />
                 <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
 

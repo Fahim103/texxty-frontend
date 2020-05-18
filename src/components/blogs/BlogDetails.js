@@ -51,7 +51,7 @@ class BlogDetails extends Component {
                     // console.log(this.state);
                 }).catch(error => {
                     if (error.response) { 
-                        console.log(error.response);
+                        // console.log(error.response);
                     }
                 })
             }
@@ -86,16 +86,21 @@ class BlogDetails extends Component {
             </Breadcrumb>
         );
     }
-    
-    renderContent() {
-        return(
-            <div>
-                {this.renderNavigation()}
-                <Card>
-                    {this.renderCreateNewPostButton(this.state.blog.blogID)}
-                    {this.renderPostList(this.state.postList)}
-                </Card>
-            </div>
+
+    renderNoPostListYetContent() {
+        return (
+            <Card className="text-center">
+                <Card.Header>No Posts Created Yet</Card.Header>
+                <Card.Body>
+                    <Card.Title>You don't have any post for the current blog</Card.Title>
+                    <Card.Text>
+                        Create new post and share your thoughts with other users...
+                    </Card.Text>
+                    <Link to={`/Blogs/${this.state.blog.blogID}/Posts/CreateNew`} className="ml-1">
+                        <Button variant="primary">Create new post</Button>
+                    </Link>
+                </Card.Body>
+            </Card>
         );
     }
 
@@ -119,6 +124,19 @@ class BlogDetails extends Component {
                 )
             });
         }
+    }
+    
+    renderContent() {
+        return(
+            <div>
+                {this.renderNavigation()}
+                <Card>
+                    {this.renderCreateNewPostButton(this.state.blog.blogID)}
+                    {(this.state.postList.length > 0) && this.renderPostList(this.state.postList)}
+                    {(this.state.postList.length === 0) && this.renderNoPostListYetContent()}
+                </Card>
+            </div>
+        );
     }
 
     render() {

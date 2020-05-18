@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import {Form, Button, Card} from 'react-bootstrap';
 import axios from 'axios';
-import history from '../../history';
 
 import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class CreatePost extends Component {
     _isMounted = false;
@@ -12,17 +12,26 @@ class CreatePost extends Component {
         title: '',
         postContent: '',
         draft: false,
-        blogID: 0
+        blogID: 0,
+        token: ''
     };
+
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
 
     componentDidMount() {
         this._isMounted = true;
-        const {userID} = this.props.user;
-        if (userID === 0) {
-            history.push(`${UserLoginRoute}`);            
+        if (this.props.user.userID === 0 && getUserID() === null) {
+            this.props.history.push(`${UserLoginRoute}`);
         } else {
             if(this._isMounted) {
-                this.setState({blogID: this.props.match.params.blogID});
+                const [token, userID] = this.getTokenAndUserID();
+                this.setState({blogID: this.props.match.params.blogID, token:token});
             }
         }
     }
@@ -52,12 +61,12 @@ class CreatePost extends Component {
             postContent : this.state.postContent,
             draft : this.state.draft,
         },{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         }
         ).then(response => {
             if(response.status === 201) {
                 // navigate to BlogDetails
-                history.push(`/Blogs/${this.state.blogID}`);
+                this.props.history.push(`/Blogs/${this.state.blogID}`);
             }
         }).catch(error => {
             console.log(error);

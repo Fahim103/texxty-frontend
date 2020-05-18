@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import {Card, Form, Button} from 'react-bootstrap';
 import {GetApiRootUrl, UserLoginRoute}  from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 
 class EditPost extends Component {
@@ -12,41 +13,53 @@ class EditPost extends Component {
         title: '',
         postContent: '',
         draft: false,
+        token: ''
+    }
+
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
     }
 
     componentDidMount() {
         this._isMounted = true;
 
-        const {userID, token} = this.props.user;
-        const {blogID, postID} = this.props.match.params;
-
-        if(userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
             // Get Post from DB
-            const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    if (this._isMounted) {
-                        const data = response.data;
-                        this.setState({
-                            postID : data.postID,
-                            title : data.title,
-                            postContent : data.postContent,
-                            draft : data.draft,
-                        })
+            if(this._isMounted){
+                const [token, userID] = this.getTokenAndUserID();
+                if(userID !== 0) {
+                    this.setState({token: token});
+                }
+                const {blogID, postID} = this.props.match.params;
+                const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        if (this._isMounted) {
+                            const data = response.data;
+                            this.setState({
+                                postID : data.postID,
+                                title : data.title,
+                                postContent : data.postContent,
+                                draft : data.draft,
+                            })
+                        }
                     }
-                }
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
-
     }
 
     componentWillUnmount() {
@@ -76,7 +89,7 @@ class EditPost extends Component {
             postContent: this.state.postContent,
             draft: this.state.draft,
         },{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         }
         ).then(response => {
             if(response.status === 200) {

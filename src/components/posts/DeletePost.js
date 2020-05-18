@@ -3,50 +3,65 @@ import axios from 'axios';
 import {Card, Button} from 'react-bootstrap';
 
 import {GetApiRootUrl, UserLoginRoute, IndividualBlogRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class DeletePost extends Component {
-    _isMounter = false;
+    _isMounted = false;
 
     state = {
         post : {},
+        token: ''
+    }
+
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
     }
 
     componentDidMount() {
-        this._isMounter = true;
+        this._isMounted = true;
 
-        if (this.props.user.userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
-            // Get post details form db
-            const {token} = this.props.user;
-            const {blogID, postID} = this.props.match.params;
-            const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    if(this._isMounter) {
-                        this.setState({post: response.data})
+            if(this._isMounted){
+                // Get post details form db
+                const [token, userID] = this.getTokenAndUserID();
+                if(userID !== 0) {
+                    this.setState({token: token});
+                }
+                const {blogID, postID} = this.props.match.params;
+                const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        if(this._isMounted) {
+                            this.setState({post: response.data})
+                        }
                     }
-                }
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 
     componentWillUnmount() {
-        this._isMounter = false;
+        this._isMounted = false;
     }
 
     deletePost = () => {
         const {blogID, postID} = this.state.post;
         let deleteUrl = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
         axios.delete(deleteUrl,{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         })
         .then(response => {
             if (response.status === 204) {
@@ -89,7 +104,7 @@ class DeletePost extends Component {
     render() {
         return (
             <div>
-                {Object.keys(this.state.post).length > 0 && this.renderContent(this.state.post)}            
+                {Object.keys(this.state.post).length > 0 && this.renderContent(this.state.post)}           
             </div>
         )
     }

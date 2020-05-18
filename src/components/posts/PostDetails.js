@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import {Card} from 'react-bootstrap';
 
 import {GetApiRootUrl, UserLoginRoute, IndividualBlogRoute, PostEditRoute, PostDeleteRoute}  from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class PostDetails extends Component {
     _isMounted = false;
@@ -11,28 +12,39 @@ class PostDetails extends Component {
     state = {
         post: {}
     }
+
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
+
     componentDidMount() {
         this._isMounted = true;
-        const {userID, token} = this.props.user;
-        const {blogID, postID} = this.props.match.params;
-        if(userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
-            const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    if (this._isMounted) {
-                        this.setState({post: response.data});
+            const [token, userID] = this.getTokenAndUserID();
+            const {blogID, postID} = this.props.match.params;
+            if(userID !== 0) {
+                const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${postID}`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        if (this._isMounted) {
+                            this.setState({post: response.data});
+                        }
                     }
-                }
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 

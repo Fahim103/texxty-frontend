@@ -3,11 +3,14 @@ import {Alert, Card, Form, Button} from 'react-bootstrap';
 import axios from 'axios';
 
 import {GetApiRootUrl, UserLoginRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class UpdatePassword extends Component {
     _isMounted = false;
 
     state = {
+        userID: 0,
+        token: '',
         currentPassword: '',
         newPassword: '',
         newPasswordConfirm: '',
@@ -15,17 +18,43 @@ class UpdatePassword extends Component {
         success: ''
     }
 
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
+
     componentDidMount() {
         this._isMounted = true;
-        const {userID} = this.props.user;
 
-        if(userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
-        } 
+        } else {
+            const [token, userID] = this.getTokenAndUserID();
+            if(userID !== 0) {
+                if(this._isMounted) {
+                    this.setState({userID: userID, token: token});
+                }
+            }
+        }
     }
 
     componentWillUnmount() {
         this._isMounted = false;
+    }
+
+    checkPasswordMatch = () => {
+        if(this.state.newPassword !== '' && this.state.newPasswordConfirm !== '') {
+            if(this.state.newPassword !== this.state.newPasswordConfirm) {
+                if(this._isMounted) {
+                    this.setState({'errors' : 'Password and Retype New Password does not match', 'success' : ''});
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     handleChange = (e) => {
@@ -37,19 +66,22 @@ class UpdatePassword extends Component {
         }   
         if(e.target.name === "newPasswordConfirm"){
             this.setState({newPasswordConfirm: e.target.value});
-        }   
+        } 
+        
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
+        if(!this.checkPasswordMatch())
+            return;
         // console.log(this.state);
-        const url = GetApiRootUrl + `/api/Accounts/${this.props.user.userID}/UpdatePassword`;
+        const url = GetApiRootUrl + `/api/Accounts/${this.state.userID}/UpdatePassword`;
         axios.put(url, {
             currentPassword: this.state.currentPassword,
             newPassword: this.state.newPassword,
             newPasswordConfirm: this.state.newPasswordConfirm,
         },{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         }
         ).then(response => {
             if(response.status === 200) {

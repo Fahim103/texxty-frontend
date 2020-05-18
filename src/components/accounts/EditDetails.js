@@ -3,39 +3,54 @@ import {Alert, Card, Form, Button} from 'react-bootstrap';
 import axios from 'axios';
 
 import {GetApiRootUrl, UserLoginRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class EditDetails extends Component {
     _isMounted = false;
 
     state = {
+        userID: 0,
         fullname: '',
         email: '',
         errors: '',
-        success: ''
+        success: '',
+        token: ''
+    }
+
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
     }
 
     componentDidMount() {
         this._isMounted = true;
-        const {userID, token} = this.props.user;
-
-        if(userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
-            const URL = GetApiRootUrl + `/api/Accounts/${userID}/Details`;
-            // Get User data from db
-            axios.get(URL, {
-                headers: { Authorization: `Bearer ${token}` }
-            }).then(response => {
-                console.log(response.data);
+            const [token, userID] = this.getTokenAndUserID();
+            if(userID !== 0) {
                 if(this._isMounted) {
-                    this.setState({
-                        'fullname' : response.data.fullName,
-                        'email' : response.data.email,
-                    })
+                    this.setState({userID: userID, token: token});
                 }
-            }).catch(error => {
-                console.log(error);
-            })
+                const URL = GetApiRootUrl + `/api/Accounts/${userID}/Details`;
+                // Get User data from db
+                axios.get(URL, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(response => {
+                    // console.log(response.data);
+                    if(this._isMounted) {
+                        this.setState({
+                            'fullname' : response.data.fullName,
+                            'email' : response.data.email,
+                        })
+                    }
+                }).catch(error => {
+                    console.log(error);
+                })
+            }
         }
     }
 
@@ -55,13 +70,16 @@ class EditDetails extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         // console.log(this.state);
-
-        const url = GetApiRootUrl + `/api/Accounts/${this.props.user.userID}/UpdateInformation`;
+        if(this._isMounted) {
+            // Clear out 
+            this.setState({'success' : '', 'errors' : ''});                
+        }
+        const url = GetApiRootUrl + `/api/Accounts/${this.state.userID}/UpdateInformation`;
         axios.put(url, {
             fullname: this.state.fullname,
             email: this.state.email,
         },{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         }
         ).then(response => {
             if(response.status === 200) {

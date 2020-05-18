@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import {Card, Button} from 'react-bootstrap';
 
 import {GetApiRootUrl, BlogListRoute, UserLoginRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 
 class DeleteBlog extends Component {
@@ -13,27 +14,37 @@ class DeleteBlog extends Component {
         blog : {},
     }
 
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
+
     componentDidMount() {
         this._isMounter = true;
 
-        if (this.props.user.userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
-            const {token, userID} = this.props.user;
-            const blogID = this.props.match.params.id;
-            const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    this.setState({blog: response.data})
-                }
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+            const [token, userID] = this.getTokenAndUserID();
+            if(userID !== 0) {
+                const blogID = this.props.match.params.id;
+                const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.setState({blog: response.data})
+                    }
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 

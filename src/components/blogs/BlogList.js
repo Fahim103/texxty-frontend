@@ -7,6 +7,8 @@ import {Link} from 'react-router-dom';
 import {Card, Button} from 'react-bootstrap';
 
 import {GetApiRootUrl, IndividualBlogRoute, UserLoginRoute, CreateNewBlogRoute, BlogEditRoute, BlogDeleteRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
+
 
 function currentDate() {
     return new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
@@ -18,28 +20,38 @@ class BlogList extends Component {
         blogList: []
     }
 
+    getTokenAndUserID = () => {
+        if(this.props.user.user !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
+
     componentDidMount() {
-        if (this.props.user.userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             history.push(`${UserLoginRoute}`);
         } else {
-            const {token, userID} = this.props.user;
-            const url = GetApiRootUrl + `/api/Users/${userID}/Blogs`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    // console.log(response);
-                    this.setState(prevState => ({
-                        blogList: response.data
-                    }))
-                }
-            }).catch(error => {
-                if (error.response) { 
-                    console.log("BlogList error");
-                    console.log(error.response);
-                }
-            })
+            const [token, userID] = this.getTokenAndUserID();
+            if(userID !== 0){
+                const url = GetApiRootUrl + `/api/Users/${userID}/Blogs`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        // console.log(response);
+                        this.setState(prevState => ({
+                            blogList: response.data
+                        }))
+                    }
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log("BlogList error");
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 

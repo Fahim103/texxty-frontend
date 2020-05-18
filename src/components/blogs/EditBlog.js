@@ -4,6 +4,7 @@ import {Card, Form, Button} from 'react-bootstrap';
 import axios from 'axios';
 
 import {GetApiRootUrl, BlogListRoute, UserLoginRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
 class EditBlog extends Component {
     _isMounted = false;
@@ -14,55 +15,69 @@ class EditBlog extends Component {
         description: '',
         private: false,
         selectedBlogTopic: 0,
-        blogTopics: []
+        blogTopics: [],
+        token: ''
     };
+    
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
 
     componentDidMount() {
         this._isMounted = true;
 
-        if (this.props.user.userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             this.props.history.push(`${UserLoginRoute}`);
         } else {
-            const {token} = this.props.user;
+            const [token, userID] = this.getTokenAndUserID();
             const blogID = this.props.match.params.id;
-            const url = GetApiRootUrl + `/api/Blogs/${blogID}`; // TODO : Might need to change
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    const data = response.data;
-                    this.setState({
-                        blogID : data.blogID,
-                        title : data.title,
-                        description : data.description,
-                        private : data.private,
-                        selectedBlogTopic : data.topicID
-                    })
-                    // Get topic list from db
-                    const url = GetApiRootUrl + `/api/Topics`;
-                    axios.get(url,{
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
-                    .then(response => {
-                        if (response.status === 200) {
-                            const data = response.data;
-                            if(this._isMounted) {
-                                this.setState({blogTopics: data})
+            if(userID !== 0) {
+                if(this._isMounted) {
+                    this.setState({token: token})
+                }
+                const url = GetApiRootUrl + `/api/Blogs/${blogID}`; // TODO : Might need to change
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        const data = response.data;
+                        this.setState({
+                            blogID : data.blogID,
+                            title : data.title,
+                            description : data.description,
+                            private : data.private,
+                            selectedBlogTopic : data.topicID
+                        })
+                        // Get topic list from db
+                        const url = GetApiRootUrl + `/api/Topics`;
+                        axios.get(url,{
+                            headers: { Authorization: `Bearer ${token}` }
+                        })
+                        .then(response => {
+                            if (response.status === 200) {
+                                const data = response.data;
+                                if(this._isMounted) {
+                                    this.setState({blogTopics: data})
+                                }
                             }
-                        }
-                    }).catch(error => {
-                        if (error.response) { 
-                            console.log("Blog Topic fetch error");
-                        }
-                    })
-                }
-                console.log(this.state);
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+                        }).catch(error => {
+                            if (error.response) { 
+                                console.log("Blog Topic fetch error");
+                            }
+                        })
+                    }
+                    console.log(this.state);
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 
@@ -82,14 +97,11 @@ class EditBlog extends Component {
         }
         if(e.target.name === "selectedBlogTopic"){
             this.setState({selectedBlogTopic: e.target.value});
-            console.log(e.target.value);
-            console.log(this.state);
         }
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
-        console.log(this.state);
 
         const url = GetApiRootUrl + `/api/Blogs/${this.state.blogID}`;
         axios.put(url, {
@@ -99,7 +111,7 @@ class EditBlog extends Component {
             private: this.state.private,
             topicId: this.state.selectedBlogTopic
         },{
-            headers: { Authorization: `Bearer ${this.props.user.token}` }
+            headers: { Authorization: `Bearer ${this.state.token}` }
         }
         ).then(response => {
             if(response.status === 200) {

@@ -6,6 +6,8 @@ import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {Card, Button, Breadcrumb} from 'react-bootstrap';
 import {GetApiRootUrl, IndividualPostRoute, UserLoginRoute, PostEditRoute, PostDeleteRoute} from '../../utils/RoutingPaths';
+import {getUserToken, getUserID} from '../../utils/localStorageHelper';
+
 import history from '../../history';
 
 class BlogDetails extends Component {
@@ -15,34 +17,44 @@ class BlogDetails extends Component {
         postList: []
     }
 
+    getTokenAndUserID = () => {
+        if(this.props.user.userID !== 0){
+            return [this.props.user.token, this.props.user.userID]
+        } else {
+            return [getUserToken(), getUserID()]
+        }
+    }
+
     componentDidMount() {
-        if (this.props.user.userID === 0) {
+        if (this.props.user.userID === 0 && getUserID() === null) {
             history.push(`${UserLoginRoute}`);
         } else {
-            const {token, userID} = this.props.user;
+            const [token, userID] = this.getTokenAndUserID();
             const blogID = this.props.match.params.id;
-            const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
-            axios.get(url,{
-                headers: { Authorization: `Bearer ${token}` }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    this.setState({blog: response.data})
-                    axios.get(`${GetApiRootUrl}/api/Blogs/${this.state.blog.blogID}/Posts`, 
-                    {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }).then(response => {
-                        this.setState({postList: response.data})
-                    }).catch(error => {
-                        console.log(error);
-                    })
-                }
-                // console.log(this.state);
-            }).catch(error => {
-                if (error.response) { 
-                    console.log(error.response);
-                }
-            })
+            if(userID !== 0){
+                const url = GetApiRootUrl + `/api/Users/${userID}/Blogs/${blogID}`;
+                axios.get(url,{
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        this.setState({blog: response.data})
+                        axios.get(`${GetApiRootUrl}/api/Blogs/${this.state.blog.blogID}/Posts`, 
+                        {
+                            headers: { Authorization: `Bearer ${token}` }
+                        }).then(response => {
+                            this.setState({postList: response.data})
+                        }).catch(error => {
+                            console.log(error);
+                        })
+                    }
+                    // console.log(this.state);
+                }).catch(error => {
+                    if (error.response) { 
+                        console.log(error.response);
+                    }
+                })
+            }
         }
     }
 

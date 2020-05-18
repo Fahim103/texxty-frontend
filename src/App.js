@@ -7,8 +7,10 @@ import {Router, Route, Switch} from 'react-router-dom'
 // Route File
 import {
   UserLoginRoute, UserRegisterRoute, AdminLoginRoute, BlogListRoute,EditDetailsRoute, UpdatePasswordRoute
-  
 } from './utils/RoutingPaths';
+
+// local storage
+import {setUsername, setUserToken, setUserID, getUsername, getUserToken, getUserID, clearLocalStorageItem} from './utils/localStorageHelper';
 
 // history
 import history from './history';
@@ -54,11 +56,29 @@ class App extends Component {
     }
   };
 
+  componentDidMount() {
+    console.log("App mounted");
+    if(this.state.user.userID === 0) {
+      console.log("App Update");
+      if(localStorage.getItem('userID') !== null) {
+        // Info stored in local storage, get them and update states
+        this.setState(prevState => ({
+          user: {                   
+              username: getUsername(),
+              token: getUserToken(),
+              userID : getUserID()
+          }
+        }))
+      }
+    }
+    console.log(this.state);
+  }
+
   componentDidUpdate(){
     if(this.state.search.results.length > 0 || this.state.search.returnUrl != null){
       // Go to search route
       history.push('/search');
-    }
+    }    
   }
 
   updateSearch = (searchResult, path) => {
@@ -78,6 +98,12 @@ class App extends Component {
             userID : response.userID
         }
     }))
+    if(this.state.userID !== 0) {
+      // State already has value, so store them in local storage
+      setUsername(this.state.user.username);
+      setUserToken(this.state.user.token);
+      setUserID(this.state.user.userID);
+    }
   };
 
   logoutUser = () => {
@@ -92,6 +118,7 @@ class App extends Component {
         returnUrl: null
       }
     }))
+    clearLocalStorageItem();
   };
 
   render(){

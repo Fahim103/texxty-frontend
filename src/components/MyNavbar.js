@@ -64,13 +64,17 @@ class MyNavbar extends Component {
     render() {
 
         const {username} = this.props;
-
         return (
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand> <NavLink to='/'>Texxty</NavLink></Navbar.Brand>
+                {(username === '') ? (
+                    <Navbar.Brand> <NavLink to='/'>Texxty</NavLink></Navbar.Brand>
+                    ) : (
+                        <Navbar.Brand> <NavLink to='/user/feed'>Texxty</NavLink></Navbar.Brand>
+                    )}
+                {/* <Navbar.Brand> <NavLink to='/'>Texxty</NavLink></Navbar.Brand> */}
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                {(username !== '') ? (<Nav.Link as={Link} to={BlogListRoute}>Blog</Nav.Link>) : (null)}
+                    {(username !== '') ? (<Nav.Link as={Link} to={BlogListRoute}>Blog</Nav.Link>) : (null)}
                     <Nav className="ml-auto">                    
                         <Form inline onSubmit={this.SearchContents}>
                             <FormControl type="text" placeholder="Search" className="mr-sm-2" required onChange={this.GetSearchText} />

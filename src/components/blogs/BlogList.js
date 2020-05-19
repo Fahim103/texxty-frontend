@@ -21,7 +21,7 @@ class BlogList extends Component {
     }
 
     getTokenAndUserID = () => {
-        if(this.props.user.user !== 0){
+        if(this.props.user.userID !== 0){
             return [this.props.user.token, this.props.user.userID]
         } else {
             return [getUserToken(), getUserID()]

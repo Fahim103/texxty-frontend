@@ -19,6 +19,8 @@ import history from './history';
 import MyNavbar from './components/MyNavbar';
 import Home from './components/Home';
 import SearchResultComponent from './components/SearchResultComponent';
+import Feed from './components/Feed';
+import AddFollowTopics from './components/AddFollowTopics';
 
 // Users / Admin
 import UserLogin from './components/user/UserLogin';
@@ -57,9 +59,9 @@ class App extends Component {
   };
 
   componentDidMount() {
-    console.log("App mounted");
+    // console.log("App mounted");
     if(this.state.user.userID === 0) {
-      console.log("App Update");
+      // console.log("App Update");
       if(localStorage.getItem('userID') !== null) {
         // Info stored in local storage, get them and update states
         this.setState(prevState => ({
@@ -136,6 +138,8 @@ class App extends Component {
                 <Route exact path={EditDetailsRoute} render={props => <EditDetails {...props} user={this.state.user} /> } />
                 <Route exact path={UpdatePasswordRoute} render={props => <UpdatePassword {...props} user={this.state.user} /> } />
                 <Route exact path='/search' component={() => (<SearchResultComponent search = {this.state.search} /> )} />
+                <Route exact path='/user/feed' render={props => <Feed {...props} user={this.state.user} /> } />
+                <Route exact path='/user/:id/feed/follow-topics' render={props => <AddFollowTopics {...props} user={this.state.user} /> } />
 
                 {/* //TODO : DON'T CHANGE THE ORDER IN WHICH THE FOLLOWING BLOG AND POST ROUTES ARE WRITTEN */}
                 <Route exact path='/Blogs/CreateNew' component={() => <CreateBlog user={this.state.user} />} />

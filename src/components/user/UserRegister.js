@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
-import {Form, Button, Row, Col} from 'react-bootstrap';
+import {Form, Button, Row, Col, Alert} from 'react-bootstrap';
 import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
-
+import history from '../../history';
 
 class UserRegister extends Component {
 
@@ -13,6 +13,8 @@ class UserRegister extends Component {
         email: '',
         password: '',
         confirmPassword: '',
+        success: '',
+        errors: ''
     };
 
     handleChange = (e) => {
@@ -37,6 +39,12 @@ class UserRegister extends Component {
         e.preventDefault();
         if(this.state.password !== this.state.confirmPassword){
             console.log("password doesn't match");
+            this.setState({'errors' : "Password's doesn't match", 'success' : ''});
+            return;
+        }
+
+        if(this.state.password.length < 8) {
+            this.setState({'errors' : "Password must be at least 8 character long", 'success' : ''});
             return;
         }
         
@@ -47,17 +55,27 @@ class UserRegister extends Component {
             email: this.state.email,
             password: this.state.password
         }).then(response => {
-            console.log(response);
+            if(response.status === 201) {
+                this.setState({
+                    'fullname': '',
+                    'username': '',
+                    'email': '',
+                    'password': '',
+                    'confirmPassword': '',
+                    'success' : "Account Created Successfully. You will be redirected shortly to login...",
+                    'errors' : ''
+                });
+                setTimeout(() => { 
+                    history.push(`${UserLoginRoute}`)
+                }, 2000);
+            }
         }).catch(error => {
             if (error.response) {
                 // client received an error response (5xx, 4xx)
                 console.log(error.response);
                 if (error.response.status === 400) {
-                    // TODO :  See the console log below and display that message to user
                     console.log(error.response.data.message);
-                } else if (error.response.status === 401){
-                    // TODO : Incorrect username / password message show
-                    console.log("Invalid username / password");
+                    this.setState({'errors' : error.response.data.message, 'success' : ''});
                 }
             } else if (error.request) {
                 // client never received a response, or request never left
@@ -71,6 +89,16 @@ class UserRegister extends Component {
     render(){
         return(
             <div className="mt-5">
+                {this.state.success !== '' &&
+                    <Alert variant='success'>
+                        {this.state.success}
+                    </Alert>
+                }
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="POST" onSubmit={this.registerUser}>
                     <Form.Group as={Row} controlId="registerFullName">
                         <Form.Label column sm={2}>
@@ -119,7 +147,7 @@ class UserRegister extends Component {
 
                     <Form.Group as={Row}>
                         <Col sm={{span: 10, offset:2}}>
-                            <Button type="submit">Sign in</Button>
+                            <Button type="submit">Sign Up</Button>
                             <Link to={UserLoginRoute} className="ml-1">
                                 <Button variant="outline-info">Already a Member</Button>
                             </Link>

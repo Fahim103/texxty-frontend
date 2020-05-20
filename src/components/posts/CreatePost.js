@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Form, Button, Card} from 'react-bootstrap';
+import {Form, Button, Card, Alert} from 'react-bootstrap';
 import axios from 'axios';
 
 import {UserLoginRoute, GetApiRootUrl} from '../../utils/RoutingPaths';
@@ -13,7 +13,8 @@ class CreatePost extends Component {
         postContent: '',
         draft: false,
         blogID: 0,
-        token: ''
+        token: '',
+        errors: ''
     };
 
     getTokenAndUserID = () => {
@@ -54,7 +55,11 @@ class CreatePost extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        
+
+        if(this.state.title === '' || this.state.postContent === '') {
+            this.setState({'errors' : "Title and Post Content must be present"});
+            return;
+        }
         const url = GetApiRootUrl + `/api/Blogs/${this.state.blogID}/Posts`;
         axios.post(url, {
             title : this.state.title,
@@ -80,6 +85,11 @@ class CreatePost extends Component {
     renderCreatePostForm() {
         return(
             <div className="mt-3">
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="post" onSubmit={this.handleSubmit}>
                     <Form.Group controlId="title">
                         <Form.Label>Post Title</Form.Label>

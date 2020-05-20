@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import {Card, Form, Button} from 'react-bootstrap';
+import {Card, Form, Button, Alert} from 'react-bootstrap';
 import {GetApiRootUrl, UserLoginRoute}  from '../../utils/RoutingPaths';
 import {getUserToken, getUserID} from '../../utils/localStorageHelper';
 
@@ -13,7 +13,8 @@ class EditPost extends Component {
         title: '',
         postContent: '',
         draft: false,
-        token: ''
+        token: '',
+        errors: ''
     }
 
     getTokenAndUserID = () => {
@@ -80,6 +81,11 @@ class EditPost extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
+
+        if(this.state.title === '' || this.state.postContent === '') {
+            this.setState({'errors' : "Title and Post Content must be present"});
+            return;
+        }
         const {blogID} = this.props.match.params;
 
         const url = GetApiRootUrl + `/api/Blogs/${blogID}/Posts/${this.state.postID}`;
@@ -103,6 +109,11 @@ class EditPost extends Component {
     renderEditPostForm() {
         return(
             <div className="mt-3">
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="post" onSubmit={this.handleSubmit}>
 
                     <Form.Group controlId="postID">

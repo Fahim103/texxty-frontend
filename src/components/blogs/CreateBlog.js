@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom';
-import {Form, Button, Card} from 'react-bootstrap';
+import {Form, Button, Card, Alert} from 'react-bootstrap';
 import axios from 'axios';
 
 import history from '../../history';
@@ -17,7 +17,8 @@ class CreateBlog extends Component {
         selectedBlogTopic: 0,
         blogTopics: [],
         userID: 0,
-        token: ''
+        token: '',
+        errors: ''
     };
 
     getTokenAndUserID = () => {
@@ -81,7 +82,11 @@ class CreateBlog extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        
+        if(this.state.title === '' || this.state.description === '') {
+            this.setState({'errors' : "Title and Description must be present"});
+            return;
+        }
+
         const url = GetApiRootUrl + '/api/Blogs';
         axios.post(url, {
             title: this.state.title,
@@ -95,6 +100,7 @@ class CreateBlog extends Component {
         ).then(response => {
             if(response.status === 201) {
                 // navigate to bloglist
+                this.setState({'errors' : ''});
                 history.push(`${BlogListRoute}`);
             }
         }).catch(error => {
@@ -111,6 +117,11 @@ class CreateBlog extends Component {
     renderCreateBlogForm() {
         return(
             <div className="mt-3">
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="post" onSubmit={this.handleSubmit}>
                     <Form.Group controlId="title">
                         <Form.Label>Blog Title</Form.Label>

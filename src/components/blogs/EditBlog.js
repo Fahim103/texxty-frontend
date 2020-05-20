@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom';
-import {Card, Form, Button} from 'react-bootstrap';
+import {Card, Form, Button, Alert} from 'react-bootstrap';
 import axios from 'axios';
 
 import {GetApiRootUrl, BlogListRoute, UserLoginRoute} from '../../utils/RoutingPaths';
@@ -16,7 +16,8 @@ class EditBlog extends Component {
         private: false,
         selectedBlogTopic: 0,
         blogTopics: [],
-        token: ''
+        token: '',
+        errors: ''
     };
     
     getTokenAndUserID = () => {
@@ -103,6 +104,11 @@ class EditBlog extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
 
+        if(this.state.title === '' || this.state.description === '') {
+            this.setState({'errors' : "Title and Description must be present"});
+            return;
+        }
+
         const url = GetApiRootUrl + `/api/Blogs/${this.state.blogID}`;
         axios.put(url, {
             blogId: this.state.blogID,
@@ -132,6 +138,11 @@ class EditBlog extends Component {
     renderEditBlogForm() {
         return(
             <div className="mt-3">
+                {this.state.errors !== '' &&
+                    <Alert variant='danger'>
+                        {this.state.errors}
+                    </Alert>
+                }
                 <Form method="post" onSubmit={this.handleSubmit}>
 
                     <Form.Group controlId="blogID">
